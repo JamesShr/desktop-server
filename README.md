@@ -27,3 +27,15 @@ npx typeorm migration:create -n MyMigration -d src/migrations`
 - [PostgreSQL](./docs/specification/postgres.md)
 
 - [Develop](./docs/specification/develop.md)
+---
+## API Document
+- Postman
+ ```
+ Please puts  postman json file and environment file at folder (./docs/postman).
+ ```
+ If there is some api information needs to illustrate , please write at 
+ [Here](./docs/postman/postman.md)
+- Swagger
+```
+Swagger api document web has init at url : {{server host}}/api/document
+```
