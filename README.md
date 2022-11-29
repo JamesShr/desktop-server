@@ -17,25 +17,32 @@ npm run start:dev:docker
 ## Generate a migration
 
 ```sh
-npx typeorm migration:create -n MyMigration -d src/migrations`
+typeorm migration:create -n MyMigration -d src/migrations`
 ```
 
 ## Specification
 
-- [Git](./docs/specification/git.md)
+-   [Git](./docs/specification/git.md)
 
-- [PostgreSQL](./docs/specification/postgres.md)
+-   [PostgreSQL](./docs/specification/postgres.md)
 
-- [Develop](./docs/specification/develop.md)
+-   [Develop](./docs/specification/develop.md)
+
 ---
+
 ## API Document
-- Postman
- ```
- Please puts  postman json file and environment file at folder (./docs/postman).
- ```
- If there is some api information needs to illustrate , please write at 
- [Here](./docs/postman/postman.md)
-- Swagger
+
+-   Postman
+
+```
+Please puts  postman json file and environment file at folder (./docs/postman).
+```
+
+If there is some api information needs to illustrate , please write at
+[Here](./docs/postman/postman.md)
+
+-   Swagger
+
 ```
 Swagger api document web has init at url : {{server host}}/api/document
 ```

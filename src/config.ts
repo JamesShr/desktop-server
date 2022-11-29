@@ -1,7 +1,6 @@
-import * as config from 'config';
+import config from 'config';
 
 export const INFO_VERSION = config.get('version') as string;
 
-
-// server 
-export const SERVER_PORT = config.get('server.port') as number;
+// port
+export const PORT_HTTP = config.get('port.http') as number;

@@ -24,6 +24,10 @@ module.exports = {
     port: 3000,
   },
 
+  port: {
+    http: 3000,
+  },
+
   redis: {
     host: 'redis',
     port: 6379,

@@ -4,16 +4,16 @@ import { OkInterceptor } from '@/modules/common/interceptors/ok.interceptor';
 
 type HealthCheck = {
   version: string;
-}
+};
 @Controller()
 @UseInterceptors(OkInterceptor)
 export class AppController {
-  constructor() { }
+  constructor() {}
 
   @Get()
   healthCheck(): HealthCheck {
     return {
-      version: INFO_VERSION
+      version: INFO_VERSION,
     };
   }
 

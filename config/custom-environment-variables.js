@@ -22,8 +22,11 @@ module.exports = {
     database: 'MONGO_DATABASE',
   },
 
-  server: {
-    port: 'SERVER_PORT',
+  port: {
+    http: {
+      __name: 'PORT_HTTP',
+      __format: 'json',
+    },
   },
 
   redis: {

@@ -3,10 +3,8 @@ import { AppController } from '@/app.controller';
 import { CommonModule } from '@/modules/common/common.module';
 
 @Module({
-  imports: [
-    CommonModule
-  ],
+  imports: [CommonModule],
   controllers: [AppController],
   providers: [],
 })
-export class AppModule { }
+export class AppModule {}

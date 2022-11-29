@@ -33,9 +33,7 @@ export class LoggerServiceImpl implements LoggerService {
         format.colorize({ all: true }),
         format.label({ label: 'sys' }),
       ),
-      transports: [
-        new transports.Console(),
-      ],
+      transports: [new transports.Console()],
     });
   }
 

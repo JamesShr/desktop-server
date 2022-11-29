@@ -1,5 +1,8 @@
 import { Module, Global } from '@nestjs/common';
-import { LoggerServiceImpl, LOGGER_SERVICE } from '@/modules/common/logger/logger.service';
+import {
+  LoggerServiceImpl,
+  LOGGER_SERVICE,
+} from '@/modules/common/logger/logger.service';
 
 const modules = [
   {
@@ -13,5 +16,4 @@ const modules = [
   providers: modules,
   exports: modules,
 })
-
-export class CommonModule { }
+export class CommonModule {}
