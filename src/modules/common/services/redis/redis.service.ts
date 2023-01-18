@@ -14,6 +14,7 @@ const connectConfig = {
 @Injectable()
 export class RedisService {
   private client: RedisClientType;
+  private subClient: RedisClientType;
 
   constructor(
     @Inject(LOGGER_SERVICE)
@@ -23,25 +24,47 @@ export class RedisService {
   }
 
   async startRedis(): Promise<void> {
+    console.log('start connect')
     this.client = createClient(connectConfig);
     this.client.on('connect', () => {
       this.logger
         .system()
         .debug(`Connect to redis ${REDIS_HOST}:${REDIS_PORT} successfully.`, {
-          label: 'redis',
-          meta: { label: 'redis' },
+          label: RedisService.name,
+          meta: { label: RedisService.name }
         });
     });
     await this.client.connect();
-  }
 
-  async deleteManyJwtids(ids: number[]) {
-    for (let id of ids) {
-      const jwtIds = await this.client.scan(0, { MATCH: `userId:${id}:*` });
-      if (jwtIds.keys.length > 0) {
-        await this.client.del(jwtIds.keys);
-      }
-    }
+    this.subClient = createClient(connectConfig);
+    this.subClient.on('connect', () => {
+      this.logger.system().debug(`Monitor expire key client connect to redis ${REDIS_HOST}:${REDIS_PORT} successfully.`,
+        {
+          label: RedisService.name,
+          meta: { label: RedisService.name }
+        });
+      this.subClient.subscribe('__keyevent@' + connectConfig.database + '__:expired', () => {
+        // console.log('subscribe expire topic');
+        this.subClient.on('message', async (chan, msg) => {
+          this.logger.system().debug(`expired : ${msg}`,
+            {
+              label: RedisService.name,
+              meta: { label: RedisService.name }
+            });
+          // console.log('[expired]', msg);
+          // this.notify.send({
+          //   service: ServiceTable.KEY_EXPIRED,
+          //   event: EventTable.KEY_EXPIRED,
+          //   content: {
+          //     key: msg,
+          //   },
+          //   value: 0
+          // });
+
+        })
+      });
+    });
+    await this.subClient.connect();
   }
 
   getClient(): RedisClientType {

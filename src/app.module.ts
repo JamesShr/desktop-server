@@ -9,4 +9,4 @@ import { CommonModule } from '@/modules/common/common.module';
   controllers: [AppController],
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }
