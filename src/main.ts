@@ -6,10 +6,13 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import {
   LoggerService,
   LOGGER_SERVICE,
-} from '@/modules/common/logger/logger.service';
+} from '@/modules/common/services/logger/logger.service';
+import { HttpExceptionFilter } from '@/modules/common/exceptions/httpException.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
+  app.useGlobalFilters(new HttpExceptionFilter());
+
   const logger = app.get<LoggerService>(LOGGER_SERVICE);
   morgan.token('json', (req: any, res: any) =>
     JSON.stringify({
@@ -67,12 +70,10 @@ async function bootstrap() {
   SwaggerModule.setup('api/document', app, document);
 
   await app.listen(PORT_HTTP, () => {
-    logger
-      .system()
-      .info(`server listen on port ${PORT_HTTP}`, {
-        label: 'Bootstrap',
-        meta: { label: 'Bootstrap' },
-      });
+    logger.system().info(`server listen on port ${PORT_HTTP}`, {
+      label: 'Bootstrap',
+      meta: { label: 'Bootstrap' },
+    });
   });
 }
 

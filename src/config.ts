@@ -32,13 +32,11 @@ export const ormConfig: TypeOrmModuleOptions = {
   schema: config.get('timescale.schema'),
   entities: [path.join(__dirname, 'entities/*.entity.js')],
   logging: process.env.NODE_ENV === 'development',
-  // cache: {
-  //   type: 'redis',
-  //   options: {
-  //     host: config.get('redis.host'),
-  //     port: config.get('redis.port'),
-  //     password: config.get('redis.password'),
-  //   },
-  //   duration: 1000 * 60 * 60 * 24,
-  // },
-}
+  cache: {
+    type: 'redis',
+    options: {
+      url: REDIS_URL,
+    },
+    duration: 1000 * 60 * 60 * 24,
+  }
+};

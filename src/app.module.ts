@@ -5,11 +5,8 @@ import { AppController } from '@/app.controller';
 import { CommonModule } from '@/modules/common/common.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forRoot(ormConfig),
-    CommonModule
-  ],
+  imports: [TypeOrmModule.forRoot(ormConfig), CommonModule],
   controllers: [AppController],
   providers: [],
 })
-export class AppModule { }
+export class AppModule {}
