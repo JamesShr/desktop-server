@@ -8,7 +8,7 @@ module.exports = {
     port: 5432,
     username: 'user',
     password: 'password',
-    database: 'edge_ems',
+    database: 'db',
     schema: 'public',
   },
 
@@ -17,7 +17,7 @@ module.exports = {
     port: 27017,
     username: 'dev',
     password: 'dev',
-    database: 'edge_ems',
+    database: 'db',
   },
 
   server: {

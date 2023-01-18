@@ -17,7 +17,7 @@ npm run start:dev:docker
 ## Generate a migration
 
 ```sh
-typeorm migration:create -n MyMigration -d src/migrations`
+typeorm migration:create src/migrations/MyMigration
 ```
 
 ## Specification

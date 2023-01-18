@@ -3,7 +3,7 @@ services:
   app:
     build:
       context: ./
-      dockerfile: Dockerfile
+      dockerfile: dev.Dockerfile
     image: app:dev
     privileged: true
     environment:
@@ -41,7 +41,7 @@ services:
     environment:
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=edge_ems
+      - POSTGRES_DB=db
     ports:
       - 5432:5432
     expose:

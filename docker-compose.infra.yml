@@ -1,0 +1,29 @@
+version: '3'
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+    expose:
+      - 6379
+
+  # mongo:
+  #   image: mongo:4.2.16
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: dev
+  #     MONGO_INITDB_ROOT_PASSWORD: dev
+  #   ports:
+  #     - 27017:27017
+  #   expose:
+  #     - 27017
+
+  timescale-db:
+    image: timescale/timescaledb:latest-pg12
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=db
+    ports:
+      - 5432:5432
+    expose:
+      - 5432
