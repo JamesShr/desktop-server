@@ -24,12 +24,11 @@ export class RedisService {
   }
 
   async startRedis(): Promise<void> {
-    console.log('start connect')
     this.client = createClient(connectConfig);
     this.client.on('connect', () => {
       this.logger
         .system()
-        .debug(`Connect to redis ${REDIS_HOST}:${REDIS_PORT} successfully.`, {
+        .debug(`Connect to redis ${REDIS_HOST}:${REDIS_PORT} Successfully.`, {
           label: RedisService.name,
           meta: { label: RedisService.name }
         });
