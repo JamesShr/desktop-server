@@ -7,6 +7,7 @@ import {
   REDIS_SERVICE,
   RedisService,
 } from '@/modules/common/services/redis/redis.service';
+import { TypeormService } from '@/modules/common/services/typeorm/typeorm.service';
 
 const modules = [
   {
@@ -17,6 +18,7 @@ const modules = [
     provide: REDIS_SERVICE,
     useClass: RedisService,
   },
+  TypeormService
 ];
 
 @Global()

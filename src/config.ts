@@ -32,6 +32,7 @@ export const ormConfig: TypeOrmModuleOptions = {
   schema: config.get('postgres.schema'),
   entities: [path.join(__dirname, 'entities/*.entity.js')],
   logging: process.env.NODE_ENV === 'development',
+  synchronize: config.get('postgres.synchronize'),
   cache: {
     type: 'redis',
     options: {

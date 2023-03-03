@@ -9,6 +9,7 @@ module.exports = {
     password: 'POSTGRES_PASSWORD',
     database: 'POSTGRES_DB',
     schema: 'POSTGRES_SCHEMA',
+    synchronize: 'POSTGRES_SYNC_HRONIZE',
   },
 
   mongo: {
