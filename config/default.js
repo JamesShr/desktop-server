@@ -3,8 +3,8 @@ const { version } = require('../package.json');
 
 module.exports = {
   version: version,
-  timescale: {
-    host: 'timescale-db',
+  postgres: {
+    host: 'postgres',
     port: 5432,
     username: 'user',
     password: 'password',

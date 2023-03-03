@@ -4,12 +4,12 @@ import path from 'path';
 
 const ormConfig: DataSourceOptions = {
   type: 'postgres',
-  host: config.get('timescale.host'),
-  port: config.get('timescale.port'),
-  username: config.get('timescale.username'),
-  password: config.get('timescale.password'),
-  database: config.get('timescale.database'),
-  schema: config.get('timescale.schema'),
+  host: config.get('postgres.host'),
+  port: config.get('postgres.port'),
+  username: config.get('postgres.username'),
+  password: config.get('postgres.password'),
+  database: config.get('postgres.database'),
+  schema: config.get('postgres.schema'),
   migrations: [path.join(__dirname, '/src/migrations/*.js')],
 };
 

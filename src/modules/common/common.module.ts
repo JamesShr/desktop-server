@@ -24,4 +24,4 @@ const modules = [
   providers: modules,
   exports: modules,
 })
-export class CommonModule {}
+export class CommonModule { }

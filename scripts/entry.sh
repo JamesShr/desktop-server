@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-bash /app/scripts/wait.sh $TIMESCALE_HOST:$TIMESCALE_PORT -t 5
+bash /app/scripts/wait.sh $POSTGRES_HOST:$POSTGRES_PORT -t 5
 
 if ls ./dist/src/migrations/*.js &> /dev/null; then
   echo "Start running migrations."

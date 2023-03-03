@@ -8,7 +8,7 @@ type HealthCheck = {
 @Controller()
 @UseInterceptors(OkInterceptor)
 export class AppController {
-  constructor() {}
+  constructor() { }
 
   @Get()
   healthCheck(): HealthCheck {

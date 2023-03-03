@@ -1,14 +1,14 @@
 module.exports = {
-  timescale: {
-    host: 'TIMESCALE_HOST',
+  postgres: {
+    host: 'POSTGRES_HOST',
     port: {
-      __name: 'TIMESCALE_PORT',
+      __name: 'POSTGRES_PORT',
       __format: 'json',
     },
-    username: 'TIMESCALE_USER',
-    password: 'TIMESCALE_PASSWORD',
-    database: 'TIMESCALE_DB',
-    schema: 'TIMESCALE_SCHEMA',
+    username: 'POSTGRES_USER',
+    password: 'POSTGRES_PASSWORD',
+    database: 'POSTGRES_DB',
+    schema: 'POSTGRES_SCHEMA',
   },
 
   mongo: {

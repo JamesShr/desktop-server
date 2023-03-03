@@ -24,12 +24,12 @@ export const REDIS_URL =
 // ormconfig
 export const ormConfig: TypeOrmModuleOptions = {
   type: 'postgres',
-  host: config.get('timescale.host'),
-  port: config.get('timescale.port'),
-  username: config.get('timescale.username'),
-  password: config.get('timescale.password'),
-  database: config.get('timescale.database'),
-  schema: config.get('timescale.schema'),
+  host: config.get('postgres.host'),
+  port: config.get('postgres.port'),
+  username: config.get('postgres.username'),
+  password: config.get('postgres.password'),
+  database: config.get('postgres.database'),
+  schema: config.get('postgres.schema'),
   entities: [path.join(__dirname, 'entities/*.entity.js')],
   logging: process.env.NODE_ENV === 'development',
   cache: {

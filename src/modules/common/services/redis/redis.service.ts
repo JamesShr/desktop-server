@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { createClient, RedisClientType } from 'redis';
-
+import { from, interval, Subject } from "rxjs";
 import { REDIS_HOST, REDIS_PORT, REDIS_URL, REDIS_DB } from '@/config';
 import { LOGGER_SERVICE, LoggerService } from '../logger/logger.service';
 
@@ -15,6 +15,7 @@ const connectConfig = {
 export class RedisService {
   private client: RedisClientType;
   private subClient: RedisClientType;
+  private readonly expireSubject = new Subject<string>();
 
   constructor(
     @Inject(LOGGER_SERVICE)
@@ -25,6 +26,7 @@ export class RedisService {
 
   async startRedis(): Promise<void> {
     this.client = createClient(connectConfig);
+
     this.client.on('connect', () => {
       this.logger
         .system()
@@ -32,6 +34,7 @@ export class RedisService {
           label: RedisService.name,
           meta: { label: RedisService.name }
         });
+      this.client.configSet('notify-keyspace-events', 'Ex');
     });
     await this.client.connect();
 
@@ -42,31 +45,27 @@ export class RedisService {
           label: RedisService.name,
           meta: { label: RedisService.name }
         });
-      this.subClient.subscribe('__keyevent@' + connectConfig.database + '__:expired', () => {
-        // console.log('subscribe expire topic');
-        this.subClient.on('message', async (chan, msg) => {
-          this.logger.system().debug(`expired : ${msg}`,
-            {
-              label: RedisService.name,
-              meta: { label: RedisService.name }
-            });
-          // console.log('[expired]', msg);
-          // this.notify.send({
-          //   service: ServiceTable.KEY_EXPIRED,
-          //   event: EventTable.KEY_EXPIRED,
-          //   content: {
-          //     key: msg,
-          //   },
-          //   value: 0
-          // });
+    });
+    this.subClient.subscribe('__keyevent@' + connectConfig.database + '__:expired', () => {
+      // console.log('subscribe expire topic');
+      this.subClient.on('message', async (chan, msg) => {
+        this.logger.system().debug(`expired : ${msg}`,
+          {
+            label: RedisService.name,
+            meta: { label: RedisService.name }
+          });
+        this.expireSubject.next(msg);
 
-        })
-      });
+      })
     });
     await this.subClient.connect();
   }
 
   getClient(): RedisClientType {
     return this.client;
+  }
+
+  getExpireSubject(): Subject<string> {
+    return this.expireSubject;
   }
 }
