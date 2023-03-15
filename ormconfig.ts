@@ -10,6 +10,7 @@ const ormConfig: DataSourceOptions = {
   password: config.get('postgres.password'),
   database: config.get('postgres.database'),
   schema: config.get('postgres.schema'),
+  entities: [path.join(__dirname, '/src/entities/*.entity.js')],
   migrations: [path.join(__dirname, '/src/migrations/*.js')],
 };
 
