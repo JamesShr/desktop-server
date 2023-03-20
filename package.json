@@ -10,6 +10,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "infra": "docker-compose -p server-template -f docker-compose.infra.yml up --build",
+    "infra:replication": "docker-compose -p server-template -f docker-compose.replication.yml up --build",
     "start": "nest start",
     "start:dev": "nest start --watch --preserveWatchOutput",
     "start:dev:docker": "NODE_ENV=development docker-compose -p server-template -f docker-compose.dev.yml up --build",

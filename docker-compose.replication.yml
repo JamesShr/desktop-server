@@ -1,0 +1,127 @@
+version: '3'
+
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+    expose:
+      - 6379
+
+  # mongo:
+  #   image: mongo:4.2.16
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: dev
+  #     MONGO_INITDB_ROOT_PASSWORD: dev
+  #   ports:
+  #     - 27017:27017
+  #   expose:
+  #     - 27017
+
+  job:
+    image: timescale/timescaledb:latest-pg12
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=PostGr3s2021
+      - POSTGRES_DB=db3
+      - POSTGRES_HOST=postgres-primary
+      - POSTGRES_PORT=5432
+    volumes:
+      - ./scripts/create-db.sh:/create-db.sh
+    command:
+      - ./create-db.sh
+    depends_on:
+      - postgres-primary
+
+  postgres-primary:
+    image: timescale/timescaledb:latest-pg12
+    environment:
+      REPLICATION_SUBNET: "0.0.0.0/0"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "PostGr3s2021"
+      POSTGRES_DB: "db"
+      REPLICATE_QUENTITY: 3
+      REPLICA_POSTGRES_USER: "james"
+      REPLICA_POSTGRES_PASSWORD: "password"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+      REPLICA_NAME: "r1"
+      SYNCHRONOUS_COMMIT: "off"
+    volumes:
+      - postgres-primary:/var/lib/postgresql/data
+      - ./scripts/replication.sh:/docker-entrypoint-initdb.d/replication.sh
+    ports:
+      - 54321:5432
+
+  postgres-replica-1:
+    image: timescale/timescaledb:latest-pg12
+    environment:
+      POSTGRES_USER: "oring"
+      POSTGRES_PASSWORD: "password"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+      REPLICA_NAME: "r1"
+      REPLICATE_FROM: "postgres-primary"
+    volumes:
+      - postgres-replica-1:/var/lib/postgresql/data
+      - ./scripts/replication.sh:/docker-entrypoint-initdb.d/replication.sh
+    depends_on:
+      - postgres-primary
+    ports:
+      - 54322:5432
+
+  postgres-replica-2:
+    image: timescale/timescaledb:latest-pg12
+    environment:
+      POSTGRES_USER: "oring"
+      POSTGRES_PASSWORD: "password"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+      REPLICA_NAME: "r2"
+      REPLICATE_FROM: "postgres-primary"
+    volumes:
+      - postgres-replica-2:/var/lib/postgresql/data
+      - ./scripts/replication.sh:/docker-entrypoint-initdb.d/replication.sh
+    depends_on:
+      - postgres-replica-1
+    ports:
+      - 54323:5432
+
+  postgres-replica-3:
+    image: timescale/timescaledb:latest-pg12
+    environment:
+      POSTGRES_USER: "oring"
+      POSTGRES_PASSWORD: "password"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+      REPLICA_NAME: "r3"
+      REPLICATE_FROM: "postgres-primary"
+    volumes:
+      - postgres-replica-3:/var/lib/postgresql/data
+      - ./scripts/replication.sh:/docker-entrypoint-initdb.d/replication.sh
+    depends_on:
+      - postgres-replica-2
+    ports:
+      - 54324:5432
+
+  postgres-proxy:
+    image: bitnami/pgpool:4
+    environment:
+      PGPOOL_BACKEND_NODES: "0:postgres-primary:5432,1:postgres-replica-1:5432,2:postgres-replica-2:5432,3:postgres-replica-3:5432"
+      PGPOOL_SR_CHECK_USER: "oring"
+      PGPOOL_SR_CHECK_PASSWORD: "password"
+      PGPOOL_ENABLE_LDAP: "no"
+      PGPOOL_POSTGRES_USERNAME: "postgres"
+      PGPOOL_POSTGRES_PASSWORD: "PostGr3s2021"
+      PGPOOL_POSTGRES_DB: "db"
+      PGPOOL_ADMIN_USERNAME: "admin"
+      PGPOOL_ADMIN_PASSWORD: "admin"
+    depends_on:
+      - postgres-primary
+      - postgres-replica-1
+      - postgres-replica-2
+      - postgres-replica-3
+    ports:
+      - 54320:5432
+
+volumes:
+  postgres-primary:
+  postgres-replica-1:
+  postgres-replica-2:
+  postgres-replica-3:

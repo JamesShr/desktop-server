@@ -1,5 +1,8 @@
 #!/bin/bash
 
+REPLICATE_SLAVE_QUENTITY=$(expr $REPLICATE_QUENTITY + 1)
+REPLICATE_SLOTS=$(expr $REPLICATE_QUENTITY + 10)
+
 # CONFIGURE PRIMARY
 if [ -z $REPLICATE_FROM ]; then
 
@@ -12,8 +15,8 @@ if [ -z $REPLICATE_FROM ]; then
     cat >>${PGDATA}/postgresql.conf <<EOF
 listen_addresses= '*'
 wal_level = replica
-max_wal_senders = 2
-max_replication_slots = 2
+max_wal_senders = ${REPLICATE_SLAVE_QUENTITY}
+max_replication_slots = ${REPLICATE_SLOTS}
 synchronous_commit = ${SYNCHRONOUS_COMMIT}
 EOF
 
@@ -37,7 +40,14 @@ EOF
 
     # Restart postgres and add replication slot
     pg_ctl -D ${PGDATA} -m fast -w restart
-    psql -U postgres -c "SELECT * FROM pg_create_physical_replication_slot('${REPLICA_NAME}_slot');"
+
+    for i in $(seq 1 $REPLICATE_SLAVE_QUENTITY); do
+      echo 'psql -U postgres -c "SELECT * FROM pg_create_physical_replication_slot('${i}_slot');'
+
+      psql -U postgres -c "SELECT * FROM pg_create_physical_replication_slot('r${i}_slot');"
+    done
+
+    # psql -U postgres -c "SELECT * FROM pg_create_physical_replication_slot('${REPLICA_NAME}_slot');"
 
     echo "Done at $(date)" >${PGDATA}/initmasterdone
 
