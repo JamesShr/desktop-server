@@ -8,8 +8,14 @@ import { BetaModule } from './modules/beta/beta.module';
 import { MicroservicesModule } from './modules/microservices/microservices.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(ormConfig), CommonModule, AlphaModule, BetaModule, MicroservicesModule],
+  imports: [
+    TypeOrmModule.forRoot(ormConfig),
+    CommonModule,
+    AlphaModule,
+    BetaModule,
+    MicroservicesModule,
+  ],
   controllers: [AppController],
   providers: [],
 })
-export class AppModule { }
+export class AppModule {}

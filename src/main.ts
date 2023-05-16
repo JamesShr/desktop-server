@@ -36,8 +36,10 @@ async function bootstrap() {
         write: (text: string) => {
           const log = text.replace(/\n$/, '');
           const json = JSON.parse(log);
-          if (json.reqbody.password) {
-            json.reqbody.password = '*****';
+          if(json.reqbody){
+            if (json.reqbody.password) {
+              json.reqbody.password = '*****';
+            }
           }
           logger.system().http({
             level: 'http',
@@ -55,8 +57,10 @@ async function bootstrap() {
         write: (text: string) => {
           const log = text.replace(/\n$/, '');
           const json = JSON.parse(log);
-          if (json.reqbody.password) {
-            json.reqbody.password = '*****';
+          if(json.reqbody){
+            if (json.reqbody.password) {
+              json.reqbody.password = '*****';
+            }
           }
           logger.system().error({
             level: 'error',

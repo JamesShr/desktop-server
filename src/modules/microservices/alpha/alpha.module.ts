@@ -2,7 +2,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { Module } from '@nestjs/common';
 import { REDIS_HOST, REDIS_PORT } from '@/config';
 import { AlphaRpcService } from './alpha.rpc';
-
+import { AlphaMqService } from './alpha.mq';
 @Module({
   imports: [
     ClientsModule.register([
@@ -16,7 +16,7 @@ import { AlphaRpcService } from './alpha.rpc';
       },
     ]),
   ],
-  providers: [AlphaRpcService],
-  exports: [AlphaRpcService],
+  providers: [AlphaRpcService, AlphaMqService],
+  exports: [AlphaRpcService, AlphaMqService],
 })
 export class AlphaModule {}

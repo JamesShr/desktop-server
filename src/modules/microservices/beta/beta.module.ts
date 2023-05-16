@@ -2,7 +2,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { Module } from '@nestjs/common';
 import { REDIS_HOST, REDIS_PORT } from '@/config';
 import { BetaRpcService } from './beta.rpc';
-
+import { BetaMqService } from './beta.mq';
 @Module({
   imports: [
     ClientsModule.register([
@@ -16,7 +16,7 @@ import { BetaRpcService } from './beta.rpc';
       },
     ]),
   ],
-  providers: [BetaRpcService],
-  exports: [BetaRpcService],
+  providers: [BetaRpcService, BetaMqService],
+  exports: [BetaRpcService, BetaMqService],
 })
 export class BetaModule {}
