@@ -20,11 +20,7 @@ module.exports = {
     password: 'dev',
     database: 'db',
   },
-
-  server: {
-    port: 3000,
-  },
-
+  
   port: {
     http: 3000,
   },

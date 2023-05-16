@@ -1,13 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import morgan from 'morgan';
 import { AppModule } from '@/app.module';
-import { PORT_HTTP, INFO_VERSION } from '@/config';
+import { PORT_HTTP, INFO_VERSION, REDIS_URL } from '@/config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import {
   LoggerService,
   LOGGER_SERVICE,
 } from '@/modules/common/services/logger/logger.service';
 import { HttpExceptionFilter } from '@/modules/common/exceptions/httpException.filter';
+import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
@@ -76,7 +77,13 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/document', app, document);
-
+  app.connectMicroservice({
+    transport: Transport.REDIS,
+    options: {
+      url: REDIS_URL,
+    },
+  });
+  await app.startAllMicroservices();
   await app.listen(PORT_HTTP, () => {
     logger.system().info(`server listen on port ${PORT_HTTP}`, {
       label: 'Bootstrap',

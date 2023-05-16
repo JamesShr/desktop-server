@@ -8,7 +8,10 @@ import {
   RedisService,
 } from '@/modules/common/services/redis/redis.service';
 import { TypeormService } from '@/modules/common/services/typeorm/typeorm.service';
-
+import {
+  QueueServiceImpl,
+  QUEUE_SERVICE,
+} from './services/queue/queue.service';
 const modules = [
   {
     provide: LOGGER_SERVICE,
@@ -18,7 +21,11 @@ const modules = [
     provide: REDIS_SERVICE,
     useClass: RedisService,
   },
-  TypeormService
+  {
+    provide: QUEUE_SERVICE,
+    useClass: QueueServiceImpl,
+  },
+  TypeormService,
 ];
 
 @Global()
@@ -26,4 +33,4 @@ const modules = [
   providers: modules,
   exports: modules,
 })
-export class CommonModule { }
+export class CommonModule {}
