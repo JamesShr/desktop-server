@@ -24,6 +24,8 @@ async function bootstrap() {
       pid: process.pid,
       ip: req.connection.remoteAddress,
       user: req.user,
+      inputTraffic: req.socket.bytesRead,
+      outputTraffic: req.socket.bytesWritten,
     }),
   );
   app.use(
@@ -33,6 +35,9 @@ async function bootstrap() {
         write: (text: string) => {
           const log = text.replace(/\n$/, '');
           const json = JSON.parse(log);
+          if (json.reqbody.password) {
+            json.reqbody.password = '*****';
+          }
           logger.system().http({
             level: 'http',
             message: `${json.method} ${json.url} ${json.statusCode}`,
@@ -49,6 +54,9 @@ async function bootstrap() {
         write: (text: string) => {
           const log = text.replace(/\n$/, '');
           const json = JSON.parse(log);
+          if (json.reqbody.password) {
+            json.reqbody.password = '*****';
+          }
           logger.system().error({
             level: 'error',
             message: `${json.method} ${json.url} ${json.statusCode}`,

@@ -1,4 +1,4 @@
-FROM node:16.15.1-alpine as builder
+FROM node:18.15.0-alpine as builder
 
 WORKDIR /app
 
@@ -7,7 +7,7 @@ COPY . /app
 RUN npm i \ 
   && npm run build
 
-FROM node:16.15.1-alpine
+FROM node:18.15.0-alpine
 
 WORKDIR /app
 
@@ -26,7 +26,9 @@ COPY --chown=node:node --from=builder /app/dist ./dist
 
 COPY --chown=node:node --from=builder /app/node_modules ./node_modules
 
-USER node
+# USER node
+RUN apk add --no-cache openssh-client
+RUN apk add sshpass
 
 ARG NODE_ENV
 ENV NODE_ENV $NODE_ENV

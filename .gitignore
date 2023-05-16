@@ -37,3 +37,9 @@ lerna-debug.log*
 config/local.js
 config/production.js
 .env.prod
+
+# sonarqube
+.scannerwork
+
+# trivy
+report
