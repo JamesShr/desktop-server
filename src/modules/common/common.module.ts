@@ -12,6 +12,11 @@ import {
   QueueServiceImpl,
   QUEUE_SERVICE,
 } from './services/queue/queue.service';
+import {
+  RX_CATCH_ERROR_SERVICE,
+  RxCatchErrorServiceImpl,
+} from './services/rxCatchError/rxCatchError.service';
+
 const modules = [
   {
     provide: LOGGER_SERVICE,
@@ -24,6 +29,10 @@ const modules = [
   {
     provide: QUEUE_SERVICE,
     useClass: QueueServiceImpl,
+  },
+  {
+    provide: RX_CATCH_ERROR_SERVICE,
+    useClass: RxCatchErrorServiceImpl,
   },
   TypeormService,
 ];

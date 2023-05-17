@@ -1,8 +1,10 @@
 import { Controller, Get, UseInterceptors } from '@nestjs/common';
 import { AlphaService } from './alpha.service';
 import { OkInterceptor } from '@/modules/common/interceptors/ok.interceptor';
+import { ApiTags } from "@nestjs/swagger";
 
 @Controller('alpha')
+@ApiTags('alpha')
 @UseInterceptors(OkInterceptor)
 export class AlphaController {
   constructor(private readonly alphaService: AlphaService) {}
@@ -20,5 +22,10 @@ export class AlphaController {
   @Get('/publish-event')
   async publishEvent() {
     this.alphaService.rpcEmit();
+  }
+
+  @Get('/mq')
+  async sendMessageQueue() {
+    this.alphaService.mq();
   }
 }

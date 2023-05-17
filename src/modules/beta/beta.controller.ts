@@ -1,8 +1,10 @@
-import { Controller, Get,UseInterceptors } from '@nestjs/common';
+import { Controller, Get, UseInterceptors } from '@nestjs/common';
 import { BetaService } from './beta.service';
 import { OkInterceptor } from '@/modules/common/interceptors/ok.interceptor';
+import { ApiTags } from "@nestjs/swagger";
 
 @Controller('beta')
+@ApiTags('beta')
 @UseInterceptors(OkInterceptor)
 export class BetaController {
   constructor(private readonly betaService: BetaService) {}
@@ -19,5 +21,10 @@ export class BetaController {
   @Get('/publish-event')
   async publishEvent() {
     this.betaService.rpcEmit();
+  }
+
+  @Get('/mq')
+  async sendMessageQueue() {
+    this.betaService.mq();
   }
 }

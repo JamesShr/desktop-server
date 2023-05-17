@@ -21,4 +21,8 @@ export class BetaService {
   async rpcEmit() {
     this.alphaRpcService.rpcEmit('alpha');
   }
+
+  async mq() {
+    this.alphaMqService.messageQueueTest();
+  }
 }
