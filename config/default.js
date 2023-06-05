@@ -12,14 +12,6 @@ module.exports = {
     schema: 'public',
     synchronize: false,
   },
-
-  mongo: {
-    host: 'mongo',
-    port: 27017,
-    username: 'dev',
-    password: 'dev',
-    database: 'db',
-  },
   
   port: {
     http: 3000,

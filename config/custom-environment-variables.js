@@ -12,17 +12,6 @@ module.exports = {
     synchronize: 'POSTGRES_SYNC_HRONIZE',
   },
 
-  mongo: {
-    host: 'MONGO_HOST',
-    port: {
-      __name: 'MONGO_PORT',
-      __format: 'json',
-    },
-    username: 'MONGO_USERNAME',
-    password: 'MONGO_PASSWORD',
-    database: 'MONGO_DATABASE',
-  },
-
   port: {
     http: {
       __name: 'PORT_HTTP',
