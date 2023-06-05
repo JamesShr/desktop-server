@@ -17,20 +17,20 @@ services:
   #   expose:
   #     - 27017
 
-  job:
-    image: timescale/timescaledb:latest-pg12
-    environment:
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=db3
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
-    volumes:
-      - ./scripts/create-db.sh:/create-db.sh
-    command:
-      - ./create-db.sh
-    depends_on:
-      - postgres
+  # job:
+  #   image: timescale/timescaledb:latest-pg12
+  #   environment:
+  #     - POSTGRES_USER=user
+  #     - POSTGRES_PASSWORD=password
+  #     - POSTGRES_DB=db3
+  #     - POSTGRES_HOST=postgres
+  #     - POSTGRES_PORT=5432
+  #   volumes:
+  #     - ./scripts/create-db.sh:/create-db.sh
+  #   command:
+  #     - ./create-db.sh
+  #   depends_on:
+  #     - postgres
 
   postgres:
     image: timescale/timescaledb:latest-pg12

@@ -8,6 +8,14 @@ import {
   RedisService,
 } from '@/modules/common/services/redis/redis.service';
 import { TypeormService } from '@/modules/common/services/typeorm/typeorm.service';
+import {
+  QueueServiceImpl,
+  QUEUE_SERVICE,
+} from './services/queue/queue.service';
+import {
+  RX_CATCH_ERROR_SERVICE,
+  RxCatchErrorServiceImpl,
+} from './services/rxCatchError/rxCatchError.service';
 
 const modules = [
   {
@@ -18,7 +26,15 @@ const modules = [
     provide: REDIS_SERVICE,
     useClass: RedisService,
   },
-  TypeormService
+  {
+    provide: QUEUE_SERVICE,
+    useClass: QueueServiceImpl,
+  },
+  {
+    provide: RX_CATCH_ERROR_SERVICE,
+    useClass: RxCatchErrorServiceImpl,
+  },
+  TypeormService,
 ];
 
 @Global()
@@ -26,4 +42,4 @@ const modules = [
   providers: modules,
   exports: modules,
 })
-export class CommonModule { }
+export class CommonModule {}
