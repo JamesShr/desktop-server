@@ -1,5 +1,5 @@
 {
-  "name": "general-api-gateway",
+  "name": "desktop-server",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -9,12 +9,12 @@
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "infra": "docker-compose -p general-api-gateway -f docker-compose.infra.yml up --build",
-    "infra:replication": "docker-compose -p general-api-gateway -f docker-compose.replication.yml up --build",
+    "infra": "docker-compose -p desktop-server -f docker-compose.infra.yml up --build",
+    "infra:replication": "docker-compose -p desktop-server -f docker-compose.replication.yml up --build",
     "start": "nest start",
     "start:dev": "nest start --watch --preserveWatchOutput",
-    "start:dev:docker": "NODE_ENV=development docker-compose -p general-api-gateway -f docker-compose.dev.yml up --build",
-    "start:prod:docker": "NODE_ENV=production docker-compose --env-file ./.env.prod -p general-api-gateway -f docker-compose.yml up -d",
+    "start:dev:docker": "NODE_ENV=development docker-compose -p desktop-server -f docker-compose.dev.yml up --build",
+    "start:prod:docker": "NODE_ENV=production docker-compose --env-file ./.env.prod -p desktop-server -f docker-compose.yml up -d",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "mg:create": "typeorm migration:create src/migrations/$MG",
@@ -25,7 +25,16 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "pkg:win64": "pkg . -t node18-win-x64 -o desktop-server --debug",
+    "pkg:win32": "pkg . -t node18-win-x86 -o desktop-server --debug",
+    "pkg:macos": "pkg . -t node18-macos-x64 -o desktop-server --debug",
+    "pkg:linux": "pkg . -t node18-linux-x64 -o desktop-server --debug"
+  },
+  "bin": "dist/src/main.js",
+  "pkg": {
+    "scripts": "dist/**/*.js",
+    "assets": "logs/**/*"
   },
   "dependencies": {
     "@nestjs/common": "^9.4.2",

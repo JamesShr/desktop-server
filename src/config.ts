@@ -1,7 +1,6 @@
 import config from 'config';
-import path from 'path';
 
-export const INFO_VERSION = config.get('version') as string;
+export const INFO_VERSION = '0.0.1';
 
 // port
 export const PORT_HTTP = config.get('port.http') as number;
