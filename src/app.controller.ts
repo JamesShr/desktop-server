@@ -1,13 +1,13 @@
 import { Controller, Get, UseInterceptors, Post } from '@nestjs/common';
 import { INFO_VERSION } from '@/config';
 import { OkInterceptor } from '@/modules/common/interceptors/ok.interceptor';
-import { ApiTags } from "@nestjs/swagger";
+// import { ApiTags } from "@nestjs/swagger";
 
 type HealthCheck = {
   version: string;
 };
 @Controller()
-@ApiTags('ping')
+// @ApiTags('ping')
 @UseInterceptors(OkInterceptor)
 export class AppController {
   constructor() { }
