@@ -31,7 +31,7 @@
     "pkg:macos": "pkg . -t node18-macos-x64 -o desktop-server --debug",
     "pkg:linux": "pkg . -t node18-linux-x64 -o desktop-server --debug"
   },
-  "bin": "dist/src/main.js",
+  "bin": "dist/main.js",
   "pkg": {
     "scripts": "dist/**/*.js",
     "assets": "logs/**/*"
@@ -45,7 +45,9 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "config": "^3.3.9",
+    "fs": "^0.0.1-security",
     "morgan": "^1.10.0",
+    "net-snmp": "^3.9.6",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^5.0.1",
     "rxjs": "^7.8.1",

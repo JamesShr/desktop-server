@@ -3,16 +3,17 @@ import { Module } from '@nestjs/common';
 // import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from '@/app.controller';
 import { CommonModule } from '@/modules/common/common.module';
-import { AuthModule } from './modules/auth/auth.module';
+
 // import { AlphaModule } from './modules/alpha/alpha.module';
 // import { BetaModule } from './modules/beta/beta.module';
 // import { MicroservicesModule } from './modules/microservices/microservices.module';
+import { SnmpModule } from './modules/snmp/snmp.module';
 
 @Module({
   imports: [
     // TypeOrmModule.forRoot(ormConfig),
     CommonModule,
-    AuthModule,
+    SnmpModule,
     // MicroservicesModule,
     // AlphaModule,
     // BetaModule,
