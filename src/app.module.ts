@@ -8,12 +8,14 @@ import { CommonModule } from '@/modules/common/common.module';
 // import { BetaModule } from './modules/beta/beta.module';
 // import { MicroservicesModule } from './modules/microservices/microservices.module';
 import { SnmpModule } from './modules/snmp/snmp.module';
+import { IpModule } from './modules/ip/ip.module';
 
 @Module({
   imports: [
     // TypeOrmModule.forRoot(ormConfig),
     CommonModule,
     SnmpModule,
+    IpModule,
     // MicroservicesModule,
     // AlphaModule,
     // BetaModule,
