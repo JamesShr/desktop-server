@@ -34,24 +34,24 @@ jobs:
           name: desktop-server-exe
           path: desktop-server.exe
 
-  upload-to-google-drive:
-    runs-on: ubuntu-latest
-    needs: build-base
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+  # upload-to-google-drive:
+  #   runs-on: ubuntu-latest
+  #   needs: build-base
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
 
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: desktop-server-exe
-          path: .
+  #     - name: Download artifact
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: desktop-server-exe
+  #         path: .
 
-      - name: Upload to Google Drive
-        uses: adityak74/google-drive-upload-git-action@main
-        with:
-          credentials: ${{ secrets.GOOGLE_OAUTH_CREDENTIALS }}
-          filename: "desktop-server.exe"
-          folderId: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
-          name: "desktop-server.exe" # optional string
-          overwrite: "true" # optional boolean
+  #     - name: Upload to Google Drive
+  #       uses: adityak74/google-drive-upload-git-action@main
+  #       with:
+  #         credentials: ${{ secrets.GOOGLE_OAUTH_CREDENTIALS }}
+  #         filename: "desktop-server.exe"
+  #         folderId: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
+  #         name: "desktop-server.exe" # optional string
+  #         overwrite: "true" # optional boolean
