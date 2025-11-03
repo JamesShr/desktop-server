@@ -48,8 +48,10 @@ jobs:
           path: .
 
       - name: Upload to Google Drive
-        uses: adityak74/google-drive-upload@v1.3.4
+        uses: adityak74/google-drive-upload-git-action@main
         with:
-          target: desktop-server.exe
-          parent_folder_id: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
           credentials: ${{ secrets.GOOGLE_OAUTH_CREDENTIALS }}
+          filename: "desktop-server.exe"
+          folderId: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
+          name: "desktop-server.exe" # optional string
+          overwrite: "true" # optional boolean
