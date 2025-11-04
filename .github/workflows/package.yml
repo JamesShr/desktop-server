@@ -27,12 +27,17 @@ jobs:
       - name: Package windows exe
         run: npm run pkg:win64
         
-      # 假設 pkg 會產出 desktop-server.exe 在專案根目錄
+        # ✅ 壓縮 exe + config 資料夾成一個 zip 檔
+      - name: Zip build outputs
+        run: |
+          zip -r desktop-server.zip desktop-server.exe config
+
+      # ✅ 上傳 zip 檔作為 artifact
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: desktop-server-exe
-          path: desktop-server.exe
+          name: desktop-server-package
+          path: desktop-server.zip
 
   # upload-to-google-drive:
   #   runs-on: ubuntu-latest
