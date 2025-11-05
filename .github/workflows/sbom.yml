@@ -2,8 +2,8 @@ name: Generate SBOM
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ main ]
+  release:
+    types: [created]
 
 jobs:
   sbom:
@@ -24,8 +24,20 @@ jobs:
         with:
           node-version: 18
 
-      # 3️⃣ 安裝依賴（用 ci 確保環境一致）
+      # ✅ Cache node_modules
+      - name: Cache node_modules
+        id: cache-npm
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # ✅ Install deps
       - name: Install dependencies
+        if: steps.cache-npm.outputs.cache-hit != 'true'
         run: npm ci
 
       # 4️⃣ 產生 SBOM（Anchore Syft）
@@ -34,7 +46,7 @@ jobs:
         with:
           path: .                          # 掃描整個 repo
           format: spdx-json                # 輸出 SPDX JSON 格式
-          artifact-name: desktop-server.spdx.json
+          artifact-name: desktop-server-sbom-spdx
           upload-artifact: true
           upload-release-assets: false
 
