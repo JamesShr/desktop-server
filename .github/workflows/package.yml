@@ -14,49 +14,33 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-        
+
+      # ✅ Cache node_modules
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # ✅ Install deps (含 pkg)
       - name: Install dependencies
         run: npm ci
 
-      - name: Install pkg
-        run: npm i -g pkg
-        
       - name: Build source
         run: npm run build
-        
+
       - name: Package windows exe
         run: npm run pkg:win64
-        
-        # ✅ 壓縮 exe + config 資料夾成一個 zip 檔
+
       - name: Zip build outputs
         run: |
           zip -r desktop-server.zip desktop-server.exe config
 
-      # ✅ 上傳 zip 檔作為 artifact
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: desktop-server-package
           path: desktop-server.zip
-
-  # upload-to-google-drive:
-  #   runs-on: ubuntu-latest
-  #   needs: build-base
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-
-  #     - name: Download artifact
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: desktop-server-exe
-  #         path: .
-
-  #     - name: Upload to Google Drive
-  #       uses: adityak74/google-drive-upload-git-action@main
-  #       with:
-  #         credentials: ${{ secrets.GOOGLE_OAUTH_CREDENTIALS }}
-  #         filename: "desktop-server.exe"
-  #         folderId: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
-  #         name: "desktop-server.exe" # optional string
-  #         overwrite: "true" # optional boolean
