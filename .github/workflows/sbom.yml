@@ -1,0 +1,43 @@
+name: Generate SBOM
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  sbom:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      actions: read
+
+    steps:
+      # 1️⃣ 取得程式碼
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2️⃣ 設定 Node.js 版本
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      # 3️⃣ 安裝依賴（用 ci 確保環境一致）
+      - name: Install dependencies
+        run: npm ci
+
+      # 4️⃣ 產生 SBOM（Anchore Syft）
+      - name: Anchore SBOM Action
+        uses: anchore/sbom-action@v0.20.9
+        with:
+          path: .                          # 掃描整個 repo
+          format: spdx-json                # 輸出 SPDX JSON 格式
+          artifact-name: desktop-server.spdx.json
+          upload-artifact: true
+          upload-release-assets: false
+
+      # （可選）5️⃣ 檢查輸出
+      - name: Verify generated SBOM
+        run: ls -lh *.spdx.json || true
