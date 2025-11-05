@@ -56,3 +56,8 @@ jobs:
           name: desktop-server-sbom-spdx   # 📦 artifact 名稱
           path: desktop-server.spdx.json   # 📄 實際檔案
 
+        # debug
+      - name: Download SBOM artifact from previous workflow
+        uses: actions/download-artifact@v4
+        with:
+          name: desktop-server-sbom-spdx
