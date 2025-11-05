@@ -46,10 +46,13 @@ jobs:
         with:
           path: .                          # 掃描整個 repo
           format: spdx-json                # 輸出 SPDX JSON 格式
-          artifact-name: desktop-server-sbom-spdx
-          upload-artifact: true
-          upload-release-assets: false
+          upload-artifact: false          # 🚫 關閉內建 upload
+          upload-release-assets: false    # 🚫 不綁 Release
+          output-file: desktop-server.spdx.json
 
-      # （可選）5️⃣ 檢查輸出
-      - name: Verify generated SBOM
-        run: ls -lh *.spdx.json || true
+      - name: Upload SBOM Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-server-sbom-spdx   # 📦 artifact 名稱
+          path: desktop-server.spdx.json   # 📄 實際檔案
+
