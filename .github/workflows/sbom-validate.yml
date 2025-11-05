@@ -1,0 +1,41 @@
+name: Validate SBOM (CycloneDX)
+
+on:
+  workflow_run:
+    workflows: ["Generate SBOM"]   # 👈 對應上一步的 workflow name
+    types:
+      - completed
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ 下載上個 workflow 上傳的 Artifact
+      - name: Download SBOM Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: desktop-server-sbom-spdx   # 👈 對應上一份 artifact-name
+          path: ./sbom
+
+      # 2️⃣ 安裝 CycloneDX CLI
+      - name: Install CycloneDX CLI
+        run: |
+          curl -L -o cyclonedx \
+            https://github.com/CycloneDX/cyclonedx-cli/releases/latest/download/cyclonedx-linux-x64
+          chmod +x cyclonedx
+          sudo mv cyclonedx /usr/local/bin/cyclonedx
+          cyclonedx version
+
+      # 3️⃣ 驗證 SBOM 檔案（SPDX 格式）
+      - name: Validate SBOM file
+        run: |
+          echo "🧾 Validating SBOM file..."
+          ls -lh ./sbom
+          cyclonedx validate \
+            --input ./sbom/desktop-server.spdx.json \
+            --input-format spdx-json
+
+      # 4️⃣ 驗證成功提示
+      - name: Validation completed
+        run: echo "✅ SBOM validation passed successfully!"
