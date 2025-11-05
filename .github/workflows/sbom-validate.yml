@@ -18,6 +18,7 @@ jobs:
       - name: Download SBOM artifact from previous workflow
         uses: actions/download-artifact@v4
         with:
+          run-id: ${{ github.event.workflow_run.id }}
           name: desktop-server-sbom-spdx
 
       - name: Install CycloneDX CLI
