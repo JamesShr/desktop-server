@@ -20,7 +20,7 @@ jobs:
         with:
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ github.token }}
-        #   name: desktop-server-sbom-spdx
+          name: desktop-server-sbom-spdx
 
       - name: Install CycloneDX CLI
         run: |
