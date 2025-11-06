@@ -231,7 +231,7 @@ jobs:
       - name: Install Syft
         if: ${{ steps.prev.outputs.previous_tag != 'none' }}
         run: |
-          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin v1.12.0
+          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
 
       # 5️⃣ 比對 SBOM 差異
       - name: Run Syft diff
