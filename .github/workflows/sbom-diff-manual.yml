@@ -29,13 +29,42 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
-      - name: Install Syft
-        run: |
-          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+      # - name: Install Syft
+      #   run: |
+      #     curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
 
-      - name: Run Syft diff
+      # - name: Run Syft diff
+      #   run: |
+      #     syft diff ./old/*.cyclonedx.json ./new/*.cyclonedx.json -o json > sbom_diff.json
+      #     cat sbom_diff.json
+      - name: Compare SBOM JSON manually
+        if: ${{ steps.prev.outputs.previous_tag != 'none' }}
         run: |
-          syft diff ./old/*.cyclonedx.json ./new/*.cyclonedx.json -o json > sbom_diff.json
+          echo "🔍 Comparing SBOMs..."
+          jq --slurp '
+            def toMap:
+              map({ ( .name + ":" + ((.version // "unknown")|tostring) ): . }) | add;
+            (.[0].components // [] | toMap) as $old |
+            (.[1].components // [] | toMap) as $new |
+            ($old | keys) as $old_keys |
+            ($new | keys) as $new_keys |
+            ( $new_keys - $old_keys ) as $added_keys |
+            ( $old_keys - $new_keys ) as $removed_keys |
+            ( ($old_keys + $new_keys) | unique ) as $all_keys |
+            {
+              added: ( $added_keys | map({ key: ., component: $new[.] }) ),
+              removed: ( $removed_keys | map({ key: ., component: $old[.] }) ),
+              changed: (
+                $all_keys
+                | map(
+                    select( ($old[.] != null) and ($new[.] != null) and ($old[.] != $new[.]) )
+                    | { key: ., old: $old[.], new: $new[.] }
+                  )
+              )
+            }
+          ' ./old/*.cyclonedx.json ./new/desktop-server.cyclonedx.json > sbom_diff.json
+
+          echo "✅ SBOM diff result:"
           cat sbom_diff.json
 
       - name: Upload diff result
