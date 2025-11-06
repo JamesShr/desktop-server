@@ -18,17 +18,18 @@ jobs:
       - name: Download SBOM artifact from previous workflow
         uses: actions/download-artifact@v4
         with:
+          name: desktop-server-sbom-spdx
+          path: ./sbom
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ github.token }}
-          name: desktop-server-sbom-spdx
 
-      - name: Install CycloneDX CLI
+      - name: Install SPDX Tools
         run: |
-          curl -L -o cyclonedx \
-            https://github.com/CycloneDX/cyclonedx-cli/releases/latest/download/cyclonedx-linux-x64
-          chmod +x cyclonedx
-          sudo mv cyclonedx /usr/local/bin/cyclonedx
-
-      - name: Validate SBOM file
+          sudo apt-get update
+          sudo apt-get install -y default-jre
+          curl -L -o spdx-tools.jar \
+            https://github.com/spdx/tools/releases/latest/download/tools.jar
+      
+      - name: Validate SPDX SBOM
         run: |
-          cyclonedx validate --input ./sbom/desktop-server.spdx.json --input-format spdx-json
+          java -jar spdx-tools.jar Verify ./sbom/desktop-server.spdx.json
