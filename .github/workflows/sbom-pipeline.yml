@@ -237,8 +237,17 @@ jobs:
       - name: Run Syft diff
         if: ${{ steps.prev.outputs.previous_tag != 'none' }}
         run: |
-          echo "🔍 Comparing SBOMs..."
-          syft sbom diff ./old/*.cyclonedx.json ./new/desktop-server.cyclonedx.json -o json > sbom_diff.json
+          echo "🔍 Comparing SBOMs manually..."
+          jq --slurp '
+            def toSet: map({( .name + ":" + .version ): .}) | add;
+            (.[0].components | toSet) as $old |
+            (.[1].components | toSet) as $new |
+            {
+              added: ($new - $old),
+              removed: ($old - $new)
+            }
+          ' ./old/*.cyclonedx.json ./new/desktop-server.cyclonedx.json > sbom_diff.json
+
           echo "✅ SBOM diff result:"
           cat sbom_diff.json
 
