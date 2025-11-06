@@ -23,19 +23,19 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ github.token }}
 
-      - name: Install SPDX Tools
+      - name: Install CycloneDX CLI
         run: |
-          sudo apt-get update
-          sudo apt-get install -y default-jre
-          # 找出最新 release 的 jar
-          LATEST_URL=$(curl -s https://api.github.com/repos/spdx/tools/releases/latest \
-            | grep browser_download_url \
-            | grep 'jar-with-dependencies.jar' \
-            | cut -d '"' -f 4)
-          echo "Downloading SPDX Tools from: $LATEST_URL"
-          wget -O spdx-tools.jar "$LATEST_URL"
-      
-      - name: Validate SPDX SBOM
+          curl -L -o cyclonedx \
+            https://github.com/CycloneDX/cyclonedx-cli/releases/latest/download/cyclonedx-linux-x64
+          chmod +x cyclonedx
+          sudo mv cyclonedx /usr/local/bin/cyclonedx
+
+      - name: Validate SBOM file
         run: |
-          java -jar spdx-tools.jar Verify ./sbom/desktop-server.spdx.json
+          echo "🧾 Validating SPDX file structure..."
+          ls -lh ./sbom
+          cyclonedx validate \
+            --input-file ./sbom/desktop-server.spdx.json \
+            --input-format json \
+            --fail-on-errors
 
