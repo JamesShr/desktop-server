@@ -126,6 +126,13 @@ jobs:
       actions: read
 
     steps:
+
+      # ✅ 先 checkout 才能讓 gh release 正常運作
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
       # 1️⃣ 下載上一步驗證後的 SBOM
       - name: Download validated SBOM
         uses: actions/download-artifact@v4
