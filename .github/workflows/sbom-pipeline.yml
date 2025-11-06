@@ -228,26 +228,21 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
 
       # 4️⃣ 安裝 Syft
-      - name: Install Syft
-        if: ${{ steps.prev.outputs.previous_tag != 'none' }}
+      # - name: Install Syft
+      #   if: ${{ steps.prev.outputs.previous_tag != 'none' }}
+      #   run: |
+      #     curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+      - name: Install Syft (legacy version)
         run: |
-          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin v0.92.0
+
 
       # 5️⃣ 比對 SBOM 差異
       - name: Run Syft diff
         if: ${{ steps.prev.outputs.previous_tag != 'none' }}
         run: |
-          echo "🔍 Comparing SBOMs manually..."
-          jq --slurp '
-            def toSet: map({( .name + ":" + .version ): .}) | add;
-            (.[0].components | toSet) as $old |
-            (.[1].components | toSet) as $new |
-            {
-              added: ($new - $old),
-              removed: ($old - $new)
-            }
-          ' ./old/*.cyclonedx.json ./new/desktop-server.cyclonedx.json > sbom_diff.json
-
+          echo "🔍 Comparing SBOMs..."
+          syft diff ./old/*.cyclonedx.json ./new/desktop-server.cyclonedx.json -o json > sbom_diff.json
           echo "✅ SBOM diff result:"
           cat sbom_diff.json
 
