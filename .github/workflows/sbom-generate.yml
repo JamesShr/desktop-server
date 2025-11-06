@@ -45,7 +45,8 @@ jobs:
         uses: anchore/sbom-action@v0.20.9
         with:
           path: .                          # 掃描整個 repo
-          format: spdx-json                # 輸出 SPDX JSON 格式
+          # format: spdx-json                # 輸出 SPDX JSON 格式
+          format: cyclonedx-json
           upload-artifact: false          # 🚫 關閉內建 upload
           upload-release-assets: false    # 🚫 不綁 Release
           output-file: desktop-server.spdx.json
