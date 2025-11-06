@@ -56,4 +56,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: desktop-server-sbom-spdx   # 📦 artifact 名稱
-          path: desktop-server.spdx.json   # 📄 實際檔案
+          # path: desktop-server.spdx.json   # 📄 實際檔案
+          path: desktop-server.cyclonedx.json   # 📄 實際檔案
