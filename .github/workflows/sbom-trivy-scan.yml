@@ -1,0 +1,43 @@
+name: Trivy Scan (from SBOM)
+
+on:
+  workflow_run:
+    workflows: ["Validate SBOM (CycloneDX)"]
+    types: [completed]
+
+jobs:
+  trivy-scan:
+    runs-on: ubuntu-latest
+
+    permissions:
+      actions: read
+      contents: read
+
+    steps:
+      # 1️⃣ 下載上一步驗證後的 SBOM artifact
+      - name: Download validated SBOM
+        uses: actions/download-artifact@v4
+        with:
+          name: desktop-server-sbom-validated
+          path: ./sbom
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+
+      # 2️⃣ 安裝 Trivy
+      - name: Install Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: sbom
+          sbom: ./sbom/desktop-server.cyclonedx.json
+          format: json
+          output: trivy_report.json
+          ignore-unfixed: true
+
+      # 3️⃣ 上傳掃描報告
+      - name: Upload Trivy report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report
+          path: |
+            trivy_report.json
+            ./sbom/desktop-server.cyclonedx.json

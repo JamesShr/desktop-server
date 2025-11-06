@@ -42,3 +42,11 @@ jobs:
             --input-format json \
             --fail-on-errors
 
+      # 4️⃣ 上傳驗證後的 SBOM 給下一個 workflow 使用
+      - name: Upload validated SBOM artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-server-sbom-validated    # 👈 給下一步 Trivy 用的 artifact 名稱
+          path: ./sbom/desktop-server.cyclonedx.json
+
