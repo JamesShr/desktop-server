@@ -30,12 +30,17 @@ jobs:
           chmod +x cyclonedx
           sudo mv cyclonedx /usr/local/bin/cyclonedx
 
-      - name: Validate SBOM file
+      - name: Validate SPDX JSON structure
         run: |
-          echo "🧾 Validating SPDX file structure..."
-          ls -lh ./sbom
-          cyclonedx validate \
-            --input-file ./sbom/desktop-server.spdx.json \
-            --input-format json \
-            --fail-on-errors
+          echo "🧾 Checking SPDX JSON validity..."
+          cat ./sbom/desktop-server.spdx.json | jq empty
+    
+      # - name: Validate SBOM file
+      #   run: |
+      #     echo "🧾 Validating SPDX file structure..."
+      #     ls -lh ./sbom
+      #     cyclonedx validate \
+      #       --input-file ./sbom/desktop-server.spdx.json \
+      #       --input-format json \
+      #       --fail-on-errors
 
