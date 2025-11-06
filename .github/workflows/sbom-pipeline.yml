@@ -1,0 +1,229 @@
+name: SBOM Full Pipeline (Generate → Validate → Scan → Diff)
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  # ------------------------------------------------------
+  # ① Generate SBOM
+  # ------------------------------------------------------
+  generate:
+    name: Generate SBOM
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+
+    steps:
+      # 1️⃣ 取得程式碼
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 2️⃣ 取得 release tag 名稱
+      - name: Get release tag
+        id: tag
+        run: echo "tag_name=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
+
+      # 3️⃣ 安裝 Node.js 並快取依賴
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Cache node_modules
+        id: cache-npm
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        if: steps.cache-npm.outputs.cache-hit != 'true'
+        run: npm ci
+
+      # 4️⃣ 產生 SBOM（Anchore Syft）
+      - name: Anchore SBOM Action
+        uses: anchore/sbom-action@v0.20.9
+        with:
+          path: .
+          format: cyclonedx-json
+          upload-artifact: false
+          upload-release-assets: false
+          output-file: desktop-server.cyclonedx.json
+
+      # 5️⃣ 上傳 SBOM 到 Release
+      - name: Upload SBOM to release
+        run: |
+          gh release upload ${{ steps.tag.outputs.tag_name }} desktop-server.cyclonedx.json --clobber
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+  # ------------------------------------------------------
+  # ② Validate SBOM (CycloneDX)
+  # ------------------------------------------------------
+  validate:
+    name: Validate SBOM
+    runs-on: ubuntu-latest
+    needs: generate
+    permissions:
+      contents: read
+      actions: read
+
+    steps:
+      # 1️⃣ 下載剛剛產的 SBOM
+      - name: Download SBOM from release
+        run: |
+          gh release download ${{ github.ref_name }} \
+            --pattern "desktop-server.cyclonedx.json" \
+            --dir ./sbom
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      # 2️⃣ 安裝 CycloneDX CLI
+      - name: Install CycloneDX CLI
+        run: |
+          curl -L -o cyclonedx \
+            https://github.com/CycloneDX/cyclonedx-cli/releases/latest/download/cyclonedx-linux-x64
+          chmod +x cyclonedx
+          sudo mv cyclonedx /usr/local/bin/cyclonedx
+
+      # 3️⃣ 驗證 SBOM 格式
+      - name: Validate SBOM
+        run: |
+          cyclonedx validate \
+            --input-file ./sbom/desktop-server.cyclonedx.json \
+            --input-format json \
+            --fail-on-errors
+
+      # 4️⃣ 驗證通過後上傳 validated SBOM
+      - name: Upload validated SBOM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-server-sbom-validated
+          path: ./sbom/desktop-server.cyclonedx.json
+
+  # ------------------------------------------------------
+  # ③ Trivy Scan
+  # ------------------------------------------------------
+  trivy-scan:
+    name: Trivy Scan (CVE)
+    runs-on: ubuntu-latest
+    needs: validate
+    permissions:
+      contents: write
+      actions: read
+
+    steps:
+      # 1️⃣ 下載上一步驗證後的 SBOM
+      - name: Download validated SBOM
+        uses: actions/download-artifact@v4
+        with:
+          name: desktop-server-sbom-validated
+          path: ./sbom
+
+      # 2️⃣ 安裝 Trivy
+      - name: Install Trivy
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget apt-transport-https gnupg lsb-release
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+          echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install -y trivy
+
+      # 3️⃣ 掃描漏洞
+      - name: Run Trivy scan
+        run: |
+          echo "🔍 Running Trivy SBOM scan..."
+          trivy sbom ./sbom/desktop-server.cyclonedx.json \
+            -f json \
+            -o trivy_report.json || true
+
+      # 4️⃣ 上傳報告與 SBOM
+      - name: Upload Trivy results to release
+        run: |
+          gh release upload ${{ github.ref_name }} trivy_report.json --clobber
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Upload combined artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-scan-results
+          path: |
+            trivy_report.json
+            ./sbom/desktop-server.cyclonedx.json
+
+  # ------------------------------------------------------
+  # ④ Syft Diff
+  # ------------------------------------------------------
+  syft-diff:
+    name: Syft Diff (Compare Previous Release)
+    runs-on: ubuntu-latest
+    needs: trivy-scan
+    permissions:
+      contents: write
+
+    steps:
+      # 1️⃣ 下載目前 release 的 SBOM
+      - name: Download current release SBOM
+        run: |
+          gh release download ${{ github.ref_name }} \
+            --pattern "desktop-server.cyclonedx.json" \
+            --dir ./new
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      # 2️⃣ 取得上一個 tag
+      - name: Find previous tag
+        id: prev
+        run: |
+          git fetch --tags
+          TAGS=($(git tag --sort=-creatordate | head -n 2))
+          CURRENT=${TAGS[0]}
+          PREVIOUS=${TAGS[1]:-none}
+          echo "current_tag=$CURRENT" >> $GITHUB_OUTPUT
+          echo "previous_tag=$PREVIOUS" >> $GITHUB_OUTPUT
+          echo "🔖 Current: $CURRENT"
+          echo "⬅️ Previous: $PREVIOUS"
+
+      - name: Skip if first release
+        if: ${{ steps.prev.outputs.previous_tag == 'none' }}
+        run: echo "No previous release found, skipping diff."
+
+      # 3️⃣ 下載上一版 release 的 SBOM
+      - name: Download previous release SBOM
+        if: ${{ steps.prev.outputs.previous_tag != 'none' }}
+        run: |
+          gh release download ${{ steps.prev.outputs.previous_tag }} \
+            --pattern "*.cyclonedx.json" \
+            --dir ./old
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      # 4️⃣ 安裝 Syft
+      - name: Install Syft
+        if: ${{ steps.prev.outputs.previous_tag != 'none' }}
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+
+      # 5️⃣ 比對 SBOM 差異
+      - name: Run Syft diff
+        if: ${{ steps.prev.outputs.previous_tag != 'none' }}
+        run: |
+          syft diff ./old/*.cyclonedx.json ./new/desktop-server.cyclonedx.json -o json > sbom_diff.json
+          cat sbom_diff.json
+
+      # 6️⃣ 上傳差異結果回 release
+      - name: Upload diff result
+        if: ${{ steps.prev.outputs.previous_tag != 'none' }}
+        run: |
+          gh release upload ${{ github.ref_name }} sbom_diff.json --clobber
+        env:
+          GITHUB_TOKEN: ${{ github.token }}

@@ -1,0 +1,52 @@
+name: Validate SBOM (CycloneDX)
+
+on:
+  workflow_run:
+    workflows: ["Generate SBOM"]
+    types:
+      - completed
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    permissions:
+      actions: read        # ✅ 需要 actions:read 才能讀取前一個 run 的 artifact
+      contents: read
+
+    steps:
+      - name: Download SBOM artifact from previous workflow
+        uses: actions/download-artifact@v4
+        with:
+          name: desktop-server-sbom-spdx
+          path: ./sbom
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+
+      - name: Install CycloneDX CLI
+        run: |
+          curl -L -o cyclonedx \
+            https://github.com/CycloneDX/cyclonedx-cli/releases/latest/download/cyclonedx-linux-x64
+          chmod +x cyclonedx
+          sudo mv cyclonedx /usr/local/bin/cyclonedx
+
+      # - name: Validate SPDX JSON structure
+      #   run: |
+      #     echo "🧾 Checking SPDX JSON validity..."
+      #     cat ./sbom/desktop-server.spdx.json | jq empty
+    
+      - name: Validate SBOM file
+        run: |
+          cyclonedx validate \
+            --input-file ./sbom/desktop-server.cyclonedx.json \
+            --input-format json \
+            --fail-on-errors
+
+      # 4️⃣ 上傳驗證後的 SBOM 給下一個 workflow 使用
+      - name: Upload validated SBOM artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-server-sbom-validated    # 👈 給下一步 Trivy 用的 artifact 名稱
+          path: ./sbom/desktop-server.cyclonedx.json
+

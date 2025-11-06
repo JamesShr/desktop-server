@@ -1,8 +1,5 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-const { version } = require('../package.json');
 
 module.exports = {
-  version: version,
   postgres: {
     host: 'postgres',
     port: 5432,
@@ -11,14 +8,6 @@ module.exports = {
     database: 'db',
     schema: 'public',
     synchronize: false,
-  },
-
-  mongo: {
-    host: 'mongo',
-    port: 27017,
-    username: 'dev',
-    password: 'dev',
-    database: 'db',
   },
   
   port: {

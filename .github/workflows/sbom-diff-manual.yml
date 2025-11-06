@@ -1,0 +1,45 @@
+name: SBOM Diff (Manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      current_tag:
+        description: '目前 release tag，例如 v1.3.0'
+        required: true
+        type: string
+      compare_tag:
+        description: '要比對的舊 release tag，例如 v1.1.0'
+        required: true
+        type: string
+
+jobs:
+  diff:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Download SBOMs from releases
+        run: |
+          mkdir old new
+          echo "⬇️ Downloading old SBOM (${{ inputs.compare_tag }})..."
+          gh release download ${{ inputs.compare_tag }} --pattern "*.cyclonedx.json" --dir ./old
+          echo "⬇️ Downloading new SBOM (${{ inputs.current_tag }})..."
+          gh release download ${{ inputs.current_tag }} --pattern "*.cyclonedx.json" --dir ./new
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Install Syft
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Run Syft diff
+        run: |
+          syft diff ./old/*.cyclonedx.json ./new/*.cyclonedx.json -o json > sbom_diff.json
+          cat sbom_diff.json
+
+      - name: Upload diff result
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-diff-report
+          path: sbom_diff.json

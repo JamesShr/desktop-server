@@ -1,0 +1,58 @@
+name: Generate SBOM
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sbom:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      actions: read
+
+    steps:
+      # 1️⃣ 取得程式碼
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2️⃣ 設定 Node.js 版本
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      # ✅ Cache node_modules
+      - name: Cache node_modules
+        id: cache-npm
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # ✅ Install deps
+      - name: Install dependencies
+        if: steps.cache-npm.outputs.cache-hit != 'true'
+        run: npm ci
+
+      # 4️⃣ 產生 SBOM（Anchore Syft）
+      - name: Anchore SBOM Action
+        uses: anchore/sbom-action@v0.20.9
+        with:
+          path: .                          # 掃描整個 repo
+          # format: spdx-json                # 輸出 SPDX JSON 格式
+          format: cyclonedx-json
+          upload-artifact: false          # 🚫 關閉內建 upload
+          upload-release-assets: false    # 🚫 不綁 Release
+          # output-file: desktop-server.spdx.json
+          output-file: desktop-server.cyclonedx.json
+
+      - name: Upload SBOM Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-server-sbom-spdx   # 📦 artifact 名稱
+          # path: desktop-server.spdx.json   # 📄 實際檔案
+          path: desktop-server.cyclonedx.json   # 📄 實際檔案

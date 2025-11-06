@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as winston from 'winston';
 import { format, transports } from 'winston';
-import 'winston-mongodb';
-import { TransformableInfo } from 'logform';
 
 /**
   error: 0,
