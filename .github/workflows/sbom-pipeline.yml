@@ -158,10 +158,22 @@ jobs:
             -f json \
             -o trivy_report.json || true
 
+      - name: Run Trivy scan HTML
+        run: |
+          echo "🔍 Running Trivy SBOM scan..."
+          trivy sbom ./sbom/desktop-server.cyclonedx.json \
+          -f template \
+          --template "@contrib/html.tpl" \
+          --download-db-only \
+          -o trivy_report.html || true
+
       # 4️⃣ 上傳報告與 SBOM
       - name: Upload Trivy results to release
         run: |
-          gh release upload ${{ github.ref_name }} trivy_report.json --clobber
+          gh release upload ${{ github.ref_name }} \
+          trivy_report.json \
+          trivy_report.html \
+          --clobber
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
@@ -171,6 +183,7 @@ jobs:
           name: trivy-scan-results
           path: |
             trivy_report.json
+            trivy_report.html
             ./sbom/desktop-server.cyclonedx.json
 
   # ------------------------------------------------------
