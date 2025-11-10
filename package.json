@@ -37,6 +37,7 @@
     "assets": "logs/**/*"
   },
   "dependencies": {
+    "@jamesshr/number-join-zero": "^1.0.2",
     "@nestjs/common": "^9.4.2",
     "@nestjs/core": "^9.4.2",
     "@nestjs/platform-express": "^9.4.2",
