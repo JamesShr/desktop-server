@@ -151,21 +151,21 @@ jobs:
           sudo apt-get install -y trivy
 
       # 3️⃣ 掃描漏洞
-      - name: Run Trivy scan
+      - name: Run Trivy scan (JSON + HTML)
         run: |
-          echo "🔍 Running Trivy SBOM scan..."
+          echo "📥 Updating Trivy database..."
+          trivy --download-db-only
+
+          echo "🔍 Running Trivy SBOM scan (JSON)..."
           trivy sbom ./sbom/desktop-server.cyclonedx.json \
             -f json \
             -o trivy_report.json || true
 
-      - name: Run Trivy scan HTML
-        run: |
-          echo "🔍 Running Trivy SBOM scan..."
+          echo "🧾 Running Trivy SBOM scan (HTML)..."
           trivy sbom ./sbom/desktop-server.cyclonedx.json \
-          -f template \
-          --template "@contrib/html.tpl" \
-          --download-db-only \
-          -o trivy_report.html || true
+            -f template \
+            --template "@contrib/html.tpl" \
+            -o trivy_report.html || true
 
       # 4️⃣ 上傳報告與 SBOM
       - name: Upload Trivy results to release
