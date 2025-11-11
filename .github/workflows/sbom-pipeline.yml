@@ -159,10 +159,7 @@ jobs:
             -o trivy_report.json || true
 
           echo "🧾 Running Trivy SBOM scan (HTML)..."
-          trivy sbom ./sbom/desktop-server.cyclonedx.json \
-            -f template \
-            --template "@contrib/html.tpl" \
-            -o trivy_report.html || true
+          trivy sbom ./sbom/desktop-server.cyclonedx.json --format template --template "@/usr/local/share/trivy/templates/html.tpl" -o trivy_report.html || true
 
       - name: Check files before upload
         run: |
