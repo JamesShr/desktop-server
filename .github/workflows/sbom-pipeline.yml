@@ -164,13 +164,18 @@ jobs:
             --template "@contrib/html.tpl" \
             -o trivy_report.html || true
 
+      - name: Check files before upload
+        run: |
+          echo "Check generated files:"
+          ls -lh trivy_report.*
+          file trivy_report.*
+
       # 4️⃣ 上傳報告與 SBOM
       - name: Upload Trivy results to release
         run: |
-          gh release upload ${{ github.ref_name }} \
-          trivy_report.json \
-          trivy_report.html \
-          --clobber
+          ls -lh trivy_report.*
+          gh release upload "${{ github.ref_name }}" trivy_report.json --clobber
+          gh release upload "${{ github.ref_name }}" trivy_report.html --clobber
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
