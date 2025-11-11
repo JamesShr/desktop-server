@@ -34,18 +34,22 @@ jobs:
           sudo apt-get install -y trivy
 
       # 3️⃣ 執行漏洞掃描
-      - name: Run Trivy scan on SBOM
+      - name: Run Trivy scan (JSON + HTML)
         run: |
-          echo "🔍 Running Trivy SBOM scan..."
+          echo "🔍 Running Trivy SBOM scan (JSON)..."
           trivy sbom ./sbom/desktop-server.cyclonedx.json \
             -f json \
-            -o trivy_report.json || true   # 👈 防止 Trivy 掃到漏洞導致整個 job fail
+            -o trivy_report.json || true
+
+          echo "🧾 Running Trivy SBOM scan (HTML)..."
+          trivy sbom ./sbom/desktop-server.cyclonedx.json --format template --template "@/usr/local/share/trivy/templates/html.tpl" -o trivy_report.html || true
 
       # 4️⃣ 上傳兩個檔案：Trivy 掃描報告 + SBOM 檔
-      - name: Upload Trivy results and SBOM
+      - name: Upload combined artifact
         uses: actions/upload-artifact@v4
         with:
           name: trivy-scan-results
           path: |
             trivy_report.json
+            trivy_report.html
             ./sbom/desktop-server.cyclonedx.json
