@@ -153,9 +153,6 @@ jobs:
       # 3️⃣ 掃描漏洞
       - name: Run Trivy scan (JSON + HTML)
         run: |
-          echo "📥 Updating Trivy database..."
-          trivy --download-db-only
-
           echo "🔍 Running Trivy SBOM scan (JSON)..."
           trivy sbom ./sbom/desktop-server.cyclonedx.json \
             -f json \
