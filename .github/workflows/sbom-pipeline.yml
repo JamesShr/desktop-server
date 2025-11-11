@@ -154,7 +154,7 @@ jobs:
       - name: Run Trivy scan (JSON + HTML)
         run: |
           echo "📥 Updating Trivy database..."
-          trivy --download-db-only
+          trivy db --download
 
           echo "🔍 Running Trivy SBOM scan (JSON)..."
           trivy sbom ./sbom/desktop-server.cyclonedx.json \
